@@ -2051,3 +2051,50 @@ Original Stack Trace:
 2023-07-09 20:32:25.164  INFO 3448 --- [SpringApplicationShutdownHook] com.alibaba.nacos.common.remote.client   : Close current connection 1688905904002_127.0.0.1_58870
 2023-07-09 20:32:25.165  INFO 3448 --- [nacos-grpc-client-executor-18] c.a.n.c.remote.client.grpc.GrpcClient    : [1688905904002_127.0.0.1_58870]Ignore complete event,isRunning:false,isAbandon=false
 2023-07-09 20:32:25.167  INFO 3448 --- [SpringApplicationShutdownHook] c.a.n.c.remote.client.grpc.GrpcClient    : Shutdown grpc executor java.util.concurrent.ThreadPoolExecutor@42feb7e2[Running, pool size = 5, active threads = 0, queued tasks = 0, completed tasks = 19]
+2023-07-09 20:32:32.373  INFO 31700 --- [main] t.w.api.WindyApiGatewayApplication       : Starting WindyApiGatewayApplication using Java 1.8.0_361 on WhiteLeaf03-16p with PID 31700 (D:\Code\web\WindyApi\WindyApi-gateway\target\classes started by WhiteLeaf03 in D:\Code\web\WindyApi\WindyApi-gateway)
+2023-07-09 20:32:32.376  INFO 31700 --- [main] t.w.api.WindyApiGatewayApplication       : No active profile set, falling back to 1 default profile: "default"
+2023-07-09 20:32:32.938  INFO 31700 --- [main] o.s.cloud.context.scope.GenericScope     : BeanFactory id=9f7e8d1f-e69d-31a2-bbc9-1a554b514e48
+2023-07-09 20:32:35.360  INFO 31700 --- [main] o.s.cloud.commons.util.InetUtils         : Cannot determine local hostname
+2023-07-09 20:32:37.356  INFO 31700 --- [main] o.s.cloud.commons.util.InetUtils         : Cannot determine local hostname
+2023-07-09 20:32:37.574  INFO 31700 --- [main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [After]
+2023-07-09 20:32:37.574  INFO 31700 --- [main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Before]
+2023-07-09 20:32:37.574  INFO 31700 --- [main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Between]
+2023-07-09 20:32:37.574  INFO 31700 --- [main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Cookie]
+2023-07-09 20:32:37.574  INFO 31700 --- [main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Header]
+2023-07-09 20:32:37.574  INFO 31700 --- [main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Host]
+2023-07-09 20:32:37.574  INFO 31700 --- [main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Method]
+2023-07-09 20:32:37.574  INFO 31700 --- [main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Path]
+2023-07-09 20:32:37.574  INFO 31700 --- [main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Query]
+2023-07-09 20:32:37.575  INFO 31700 --- [main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [ReadBody]
+2023-07-09 20:32:37.575  INFO 31700 --- [main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [RemoteAddr]
+2023-07-09 20:32:37.575  INFO 31700 --- [main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [XForwardedRemoteAddr]
+2023-07-09 20:32:37.575  INFO 31700 --- [main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [Weight]
+2023-07-09 20:32:37.575  INFO 31700 --- [main] o.s.c.g.r.RouteDefinitionRouteLocator    : Loaded RoutePredicateFactory [CloudFoundryRouteService]
+2023-07-09 20:32:39.675  INFO 31700 --- [main] o.s.cloud.commons.util.InetUtils         : Cannot determine local hostname
+2023-07-09 20:32:39.826  INFO 31700 --- [main] com.alibaba.nacos.common.remote.client   : [RpcClientFactory] create a new rpc client of 7b9e5f81-1471-43f3-958b-c2cd79cdb936
+2023-07-09 20:32:39.864  INFO 31700 --- [main] org.reflections.Reflections              : Reflections took 23 ms to scan 1 urls, producing 3 keys and 6 values 
+2023-07-09 20:32:39.890  INFO 31700 --- [main] org.reflections.Reflections              : Reflections took 14 ms to scan 1 urls, producing 4 keys and 9 values 
+2023-07-09 20:32:39.909  INFO 31700 --- [main] org.reflections.Reflections              : Reflections took 17 ms to scan 1 urls, producing 3 keys and 10 values 
+2023-07-09 20:32:40.116  INFO 31700 --- [main] org.reflections.Reflections              : Reflections took 193 ms to scan 119 urls, producing 0 keys and 0 values 
+2023-07-09 20:32:40.125  INFO 31700 --- [main] org.reflections.Reflections              : Reflections took 8 ms to scan 1 urls, producing 1 keys and 5 values 
+2023-07-09 20:32:40.136  INFO 31700 --- [main] org.reflections.Reflections              : Reflections took 9 ms to scan 1 urls, producing 1 keys and 7 values 
+2023-07-09 20:32:40.148  INFO 31700 --- [main] org.reflections.Reflections              : Reflections took 9 ms to scan 1 urls, producing 2 keys and 8 values 
+2023-07-09 20:32:40.257  INFO 31700 --- [main] org.reflections.Reflections              : Reflections took 106 ms to scan 119 urls, producing 0 keys and 0 values 
+2023-07-09 20:32:40.258  INFO 31700 --- [main] com.alibaba.nacos.common.remote.client   : [7b9e5f81-1471-43f3-958b-c2cd79cdb936] RpcClient init label, labels = {module=naming, source=sdk}
+2023-07-09 20:32:40.259  INFO 31700 --- [main] com.alibaba.nacos.common.remote.client   : [7b9e5f81-1471-43f3-958b-c2cd79cdb936] RpcClient init, ServerListFactory = com.alibaba.nacos.client.naming.core.ServerListManager
+2023-07-09 20:32:40.259  INFO 31700 --- [main] com.alibaba.nacos.common.remote.client   : [7b9e5f81-1471-43f3-958b-c2cd79cdb936] Registry connection listener to current client:com.alibaba.nacos.client.naming.remote.gprc.redo.NamingGrpcRedoService
+2023-07-09 20:32:40.259  INFO 31700 --- [main] com.alibaba.nacos.common.remote.client   : [7b9e5f81-1471-43f3-958b-c2cd79cdb936] Register server push request handler:com.alibaba.nacos.client.naming.remote.gprc.NamingPushRequestHandler
+2023-07-09 20:32:40.260  INFO 31700 --- [main] com.alibaba.nacos.common.remote.client   : [7b9e5f81-1471-43f3-958b-c2cd79cdb936] Try to connect to server on start up, server: {serverIp = 'localhost', server main port = 8848}
+2023-07-09 20:32:43.660  INFO 31700 --- [main] com.alibaba.nacos.common.remote.client   : [7b9e5f81-1471-43f3-958b-c2cd79cdb936] Success to connect to server [localhost:8848] on start up, connectionId = 1688905963476_127.0.0.1_59002
+2023-07-09 20:32:43.661  INFO 31700 --- [com.alibaba.nacos.client.remote.worker] com.alibaba.nacos.common.remote.client   : [7b9e5f81-1471-43f3-958b-c2cd79cdb936] Notify connected event to listeners.
+2023-07-09 20:32:43.661  INFO 31700 --- [main] com.alibaba.nacos.common.remote.client   : [7b9e5f81-1471-43f3-958b-c2cd79cdb936] Register server push request handler:com.alibaba.nacos.common.remote.client.RpcClient$ConnectResetRequestHandler
+2023-07-09 20:32:43.661  INFO 31700 --- [main] com.alibaba.nacos.common.remote.client   : [7b9e5f81-1471-43f3-958b-c2cd79cdb936] Register server push request handler:com.alibaba.nacos.common.remote.client.RpcClient$$Lambda$704/1623924438
+2023-07-09 20:32:44.267  INFO 31700 --- [nacos-grpc-client-executor-7] com.alibaba.nacos.common.remote.client   : [7b9e5f81-1471-43f3-958b-c2cd79cdb936] Receive server push request, request = NotifySubscriberRequest, requestId = 6
+2023-07-09 20:32:44.268  INFO 31700 --- [nacos-grpc-client-executor-7] com.alibaba.nacos.common.remote.client   : [7b9e5f81-1471-43f3-958b-c2cd79cdb936] Ack server push request, request = NotifySubscriberRequest, requestId = 6
+2023-07-09 20:32:45.200  INFO 31700 --- [main] o.s.b.web.embedded.netty.NettyWebServer  : Netty started on port 8080
+2023-07-09 20:32:47.323  INFO 31700 --- [main] o.s.cloud.commons.util.InetUtils         : Cannot determine local hostname
+2023-07-09 20:32:49.396  INFO 31700 --- [main] o.s.cloud.commons.util.InetUtils         : Cannot determine local hostname
+2023-07-09 20:32:49.405  INFO 31700 --- [main] c.a.c.n.registry.NacosServiceRegistry    : nacos registry, DEFAULT_GROUP gateway 192.168.220.1:9080 register finished
+2023-07-09 20:32:49.420  INFO 31700 --- [main] t.w.api.WindyApiGatewayApplication       : Started WindyApiGatewayApplication in 19.511 seconds (JVM running for 20.912)
+2023-07-09 20:32:49.989  INFO 31700 --- [nacos-grpc-client-executor-13] com.alibaba.nacos.common.remote.client   : [7b9e5f81-1471-43f3-958b-c2cd79cdb936] Receive server push request, request = NotifySubscriberRequest, requestId = 7
+2023-07-09 20:32:49.994  INFO 31700 --- [nacos-grpc-client-executor-13] com.alibaba.nacos.common.remote.client   : [7b9e5f81-1471-43f3-958b-c2cd79cdb936] Ack server push request, request = NotifySubscriberRequest, requestId = 7
