@@ -12,6 +12,7 @@ import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
@@ -153,6 +154,7 @@ public class CustomerGlobalFilter implements GlobalFilter {
     private Mono<Void> intercept(String msg) {
         String responseResult = JSONUtil.toJsonStr(ResponseResult.error(msg));
         byte[] bytes = responseResult.getBytes(StandardCharsets.UTF_8);
+        response.getHeaders().set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE + ";charset=" + StandardCharsets.UTF_8);
         DataBuffer buffer = response.bufferFactory().wrap(bytes);
         return response.writeWith(Mono.just(buffer));
     }
