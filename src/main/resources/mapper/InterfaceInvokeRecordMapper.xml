@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="top.whiteleaf03.api.mapper.InterfaceInvokeRecordMapper">
+    <insert id="insert" flushCache="true" statementType="STATEMENT">
+        <foreach collection="list" item="record" separator=";">
+            INSERT INTO windy_api.interface_invoke_record (userId, interfaceId) VALUE (#{record.userId}, #{record.interfaceId})
+        </foreach>
+    </insert>
+</mapper>
