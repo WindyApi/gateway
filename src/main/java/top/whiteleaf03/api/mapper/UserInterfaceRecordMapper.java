@@ -1,7 +1,7 @@
 package top.whiteleaf03.api.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
-import top.whiteleaf03.api.modal.UserIdAndInterfaceId;
+import top.whiteleaf03.api.modal.UserIdAndInterfaceIdVO;
 
 /**
  * @author WhiteLeaf03
@@ -11,15 +11,15 @@ public interface UserInterfaceRecordMapper {
     /**
      * 查询剩余使用次数
      *
-     * @param userIdAndInterfaceId 用户id和接口id
+     * @param userIdAndInterfaceIdVO 用户id和接口id
      * @return 返回结果
      */
-    Long selectLeftNumByUserIdAndInterfaceId(UserIdAndInterfaceId userIdAndInterfaceId);
+    Long selectLeftNumByUserIdAndInterfaceId(UserIdAndInterfaceIdVO userIdAndInterfaceIdVO);
 
     /**
      * 减少使用次数
      *
-     * @param userIdAndInterfaceId 用户id和接口id
+     * @param userIdAndInterfaceIdVO 用户id和接口id
      */
-    void updateLeftNumByUserIdAndInterfaceId(UserIdAndInterfaceId userIdAndInterfaceId);
+    void updateLeftNumByUserIdAndInterfaceId(UserIdAndInterfaceIdVO userIdAndInterfaceIdVO);
 }

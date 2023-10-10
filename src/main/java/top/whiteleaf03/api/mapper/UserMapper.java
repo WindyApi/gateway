@@ -1,7 +1,7 @@
 package top.whiteleaf03.api.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
-import top.whiteleaf03.api.modal.UserIdAndSecretKey;
+import top.whiteleaf03.api.modal.UserIdAndSecretKeyVO;
 
 /**
  * @author WhiteLeaf03
@@ -14,5 +14,5 @@ public interface UserMapper {
      * @param accessKey accessKey
      * @return 返回用户的id和sk
      */
-    UserIdAndSecretKey selectIdAndSecretKeyByAccessKey(String accessKey);
+    UserIdAndSecretKeyVO selectIdAndSecretKeyByAccessKey(String accessKey);
 }

@@ -1,6 +1,5 @@
 package top.whiteleaf03.api.filter;
 
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -21,9 +20,9 @@ import reactor.core.publisher.Mono;
 import top.whiteleaf03.api.mapper.InterfaceInfoMapper;
 import top.whiteleaf03.api.mapper.UserInterfaceRecordMapper;
 import top.whiteleaf03.api.mapper.UserMapper;
-import top.whiteleaf03.api.modal.InterfaceIdAndStatus;
-import top.whiteleaf03.api.modal.UserIdAndInterfaceId;
-import top.whiteleaf03.api.modal.UserIdAndSecretKey;
+import top.whiteleaf03.api.modal.InterfaceIdAndStatusVO;
+import top.whiteleaf03.api.modal.UserIdAndInterfaceIdVO;
+import top.whiteleaf03.api.modal.UserIdAndSecretKeyVO;
 import top.whiteleaf03.api.util.ResponseResult;
 import top.whiteleaf03.api.util.SignUtil;
 
@@ -83,15 +82,15 @@ public class CustomerGlobalFilter implements GlobalFilter {
 
         // 查询用户的id和secretKey
         String accessKey = headers.getFirst(ACCESS_KEY_HEADER);
-        UserIdAndSecretKey userIdAndSecretKey = userMapper.selectIdAndSecretKeyByAccessKey(accessKey);
-        if (Objects.isNull(userIdAndSecretKey)) {
+        UserIdAndSecretKeyVO userIdAndSecretKeyVO = userMapper.selectIdAndSecretKeyByAccessKey(accessKey);
+        if (Objects.isNull(userIdAndSecretKeyVO)) {
             log.info("请求未通过 原因:accessKey错误");
             return intercept("请求未通过 原因:accessKey错误");
         }
 
         // 签名校验
         String requestBody = (request.getMethod() == HttpMethod.GET) ? headers.getFirst(PARAMS_HEADER) : headers.getFirst(BODY_HEADER);
-        String validSign = SignUtil.genSign(timestamp, requestBody, userIdAndSecretKey.getSecretKey());
+        String validSign = SignUtil.genSign(timestamp, requestBody, userIdAndSecretKeyVO.getSecretKey());
         log.info("校验签名:{}", validSign);
         if (!StrUtil.equals(headers.getFirst(SIGN_HEADER), validSign)) {
             // 签名校验失败
@@ -108,21 +107,21 @@ public class CustomerGlobalFilter implements GlobalFilter {
         }
 
         // 判断接口状态
-        InterfaceIdAndStatus interfaceIdAndStatus = interfaceInfoMapper.selectIdAndStatusByUrl(request.getPath().toString());
-        if (!interfaceIdAndStatus.getStatus()) {
+        InterfaceIdAndStatusVO interfaceIdAndStatusVO = interfaceInfoMapper.selectIdAndStatusByUrl(request.getPath().toString());
+        if (!interfaceIdAndStatusVO.getStatus()) {
             // 接口已下线，不允许调用
             log.info("请求未通过 原因:接口已下线");
             return intercept("请求未通过 原因:接口已下线");
         }
 
         // 判断用户剩余可用次数
-        UserIdAndInterfaceId userIdAndInterfaceId = new UserIdAndInterfaceId(userIdAndSecretKey.getId(), interfaceIdAndStatus.getInterfaceId());
-        Long leftNum = userInterfaceRecordMapper.selectLeftNumByUserIdAndInterfaceId(userIdAndInterfaceId);
+        UserIdAndInterfaceIdVO userIdAndInterfaceIdVO = new UserIdAndInterfaceIdVO(userIdAndSecretKeyVO.getId(), interfaceIdAndStatusVO.getInterfaceId());
+        Long leftNum = userInterfaceRecordMapper.selectLeftNumByUserIdAndInterfaceId(userIdAndInterfaceIdVO);
         if (Objects.isNull(leftNum) || leftNum <= 0) {
             log.info("请求未通过 原因:剩余调用次数不足");
             return intercept("请求未通过 原因:剩余调用次数不足");
         }
-        userInterfaceRecordMapper.updateLeftNumByUserIdAndInterfaceId(userIdAndInterfaceId);
+        userInterfaceRecordMapper.updateLeftNumByUserIdAndInterfaceId(userIdAndInterfaceIdVO);
         log.info("请求通过");
         return chain.filter(exchange);
     }

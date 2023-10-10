@@ -10,14 +10,14 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserIdAndInterfaceId {
+public class UserIdAndSecretKeyVO {
     /**
      * 用户id
      */
-    private Long userId;
+    private Long id;
 
     /**
-     * 接口id
+     * 用户的秘钥
      */
-    private Long interfaceId;
+    private String secretKey;
 }

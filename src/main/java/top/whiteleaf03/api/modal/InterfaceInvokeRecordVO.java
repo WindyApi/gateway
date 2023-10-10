@@ -12,7 +12,7 @@ import java.util.Date;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class InterfaceInvokeRecord {
+public class InterfaceInvokeRecordVO {
     /**
      * 主键
      */
@@ -33,7 +33,7 @@ public class InterfaceInvokeRecord {
      */
     private Date createTime;
 
-    public InterfaceInvokeRecord(Long userId, Long interfaceId) {
+    public InterfaceInvokeRecordVO(Long userId, Long interfaceId) {
         this.userId = userId;
         this.interfaceId = interfaceId;
     }

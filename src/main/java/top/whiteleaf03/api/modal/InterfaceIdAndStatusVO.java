@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class InterfaceIdAndStatus {
+public class InterfaceIdAndStatusVO {
     /**
      * 接口id
      */

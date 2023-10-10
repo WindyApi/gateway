@@ -1,7 +1,7 @@
 package top.whiteleaf03.api.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
-import top.whiteleaf03.api.modal.InterfaceIdAndStatus;
+import top.whiteleaf03.api.modal.InterfaceIdAndStatusVO;
 
 /**
  * @author WhiteLeaf03
@@ -14,5 +14,5 @@ public interface InterfaceInfoMapper {
      * @param url 接口路径
      * @return 返回结果
      */
-    InterfaceIdAndStatus selectIdAndStatusByUrl(String url);
+    InterfaceIdAndStatusVO selectIdAndStatusByUrl(String url);
 }
