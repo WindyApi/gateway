@@ -25,6 +25,7 @@ import top.whiteleaf03.api.modal.UserIdAndInterfaceIdVO;
 import top.whiteleaf03.api.modal.UserIdAndSecretKeyVO;
 import top.whiteleaf03.api.util.ResponseResult;
 import top.whiteleaf03.api.util.SignUtil;
+import top.whiteleaf03.api.util.TimeUtil;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -137,6 +138,7 @@ public class CustomerGlobalFilter implements GlobalFilter {
         log.info("请求路径:{}", request.getPath());
         log.info("请求时间戳:{}", request.getHeaders().getFirst("timestamp"));
         log.info("接收时间戳:{}", System.currentTimeMillis());
+        TimeUtil.startTiming();
         if (request.getMethod() == HttpMethod.GET) {
             // GET请求
             log.info("请求头参数:{}", request.getHeaders().getFirst("params"));
@@ -155,6 +157,7 @@ public class CustomerGlobalFilter implements GlobalFilter {
         byte[] bytes = responseResult.getBytes(StandardCharsets.UTF_8);
         response.getHeaders().set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE + ";charset=" + StandardCharsets.UTF_8);
         DataBuffer buffer = response.bufferFactory().wrap(bytes);
+        TimeUtil.endTiming();
         return response.writeWith(Mono.just(buffer));
     }
 }
