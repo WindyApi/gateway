@@ -3,7 +3,7 @@ package top.whiteleaf03.api.filter;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.annotation.Order;
@@ -17,12 +17,12 @@ import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
-import top.whiteleaf03.api.mapper.InterfaceInfoMapper;
-import top.whiteleaf03.api.mapper.UserInterfaceRecordMapper;
-import top.whiteleaf03.api.mapper.UserMapper;
-import top.whiteleaf03.api.modal.InterfaceIdAndStatusVO;
-import top.whiteleaf03.api.modal.UserIdAndInterfaceIdVO;
-import top.whiteleaf03.api.modal.UserIdAndSecretKeyVO;
+import top.whiteleaf03.api.dubbo.interfaceinfo.InterfaceInfoDubboService;
+import top.whiteleaf03.api.dubbo.user.UserDubboService;
+import top.whiteleaf03.api.dubbo.userinterfacerecord.UserInterfaceRecordDubboService;
+import top.whiteleaf03.api.modal.dto.InterfaceIdAndStatusDTO;
+import top.whiteleaf03.api.modal.dto.UserIdAndInterfaceIdDTO;
+import top.whiteleaf03.api.modal.dto.UserIdAndSecretKeyDTO;
 import top.whiteleaf03.api.util.ResponseResult;
 import top.whiteleaf03.api.util.SignUtil;
 import top.whiteleaf03.api.util.TimeUtil;
@@ -38,9 +38,12 @@ import java.util.Objects;
 @Order(-1)
 @Component
 public class CustomerGlobalFilter implements GlobalFilter {
-    private final UserMapper userMapper;
-    private final InterfaceInfoMapper interfaceInfoMapper;
-    private final UserInterfaceRecordMapper userInterfaceRecordMapper;
+    @DubboReference
+    private UserDubboService userDubboService;
+    @DubboReference
+    private InterfaceInfoDubboService interfaceInfoDubboService;
+    @DubboReference
+    private UserInterfaceRecordDubboService userInterfaceRecordDubboService;
     private static final String TIMESTAMP_HEADER = "timestamp";
     private static final String ACCESS_KEY_HEADER = "accessKey";
     private static final String SIGN_HEADER = "sign";
@@ -49,13 +52,6 @@ public class CustomerGlobalFilter implements GlobalFilter {
     private static final long FIVE_MINUTES = Duration.ofMinutes(5).toMillis();
     private ServerHttpRequest request;
     private ServerHttpResponse response;
-
-    @Autowired
-    public CustomerGlobalFilter(UserMapper userMapper, InterfaceInfoMapper interfaceInfoMapper, UserInterfaceRecordMapper userInterfaceRecordMapper) {
-        this.userMapper = userMapper;
-        this.interfaceInfoMapper = interfaceInfoMapper;
-        this.userInterfaceRecordMapper = userInterfaceRecordMapper;
-    }
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -83,15 +79,15 @@ public class CustomerGlobalFilter implements GlobalFilter {
 
         // 查询用户的id和secretKey
         String accessKey = headers.getFirst(ACCESS_KEY_HEADER);
-        UserIdAndSecretKeyVO userIdAndSecretKeyVO = userMapper.selectIdAndSecretKeyByAccessKey(accessKey);
-        if (Objects.isNull(userIdAndSecretKeyVO)) {
+        UserIdAndSecretKeyDTO userIdAndSecretKeyDTO = userDubboService.selectUserIdAndSecretKeyByAccessKey(accessKey);
+        if (Objects.isNull(userIdAndSecretKeyDTO)) {
             log.info("请求未通过 原因:accessKey错误");
             return intercept("请求未通过 原因:accessKey错误");
         }
 
         // 签名校验
         String requestBody = (request.getMethod() == HttpMethod.GET) ? headers.getFirst(PARAMS_HEADER) : headers.getFirst(BODY_HEADER);
-        String validSign = SignUtil.genSign(timestamp, requestBody, userIdAndSecretKeyVO.getSecretKey());
+        String validSign = SignUtil.genSign(timestamp, requestBody, userIdAndSecretKeyDTO.getSecretKey());
         log.info("校验签名:{}", validSign);
         if (!StrUtil.equals(headers.getFirst(SIGN_HEADER), validSign)) {
             // 签名校验失败
@@ -108,21 +104,21 @@ public class CustomerGlobalFilter implements GlobalFilter {
         }
 
         // 判断接口状态
-        InterfaceIdAndStatusVO interfaceIdAndStatusVO = interfaceInfoMapper.selectIdAndStatusByUrl(request.getPath().toString());
-        if (!interfaceIdAndStatusVO.getStatus()) {
+        InterfaceIdAndStatusDTO interfaceIdAndStatusDTO = interfaceInfoDubboService.selectIdAndStatusByUrl(request.getPath().toString());
+        if (!interfaceIdAndStatusDTO.getStatus()) {
             // 接口已下线，不允许调用
             log.info("请求未通过 原因:接口已下线");
             return intercept("请求未通过 原因:接口已下线");
         }
 
         // 判断用户剩余可用次数
-        UserIdAndInterfaceIdVO userIdAndInterfaceIdVO = new UserIdAndInterfaceIdVO(userIdAndSecretKeyVO.getId(), interfaceIdAndStatusVO.getInterfaceId());
-        Long leftNum = userInterfaceRecordMapper.selectLeftNumByUserIdAndInterfaceId(userIdAndInterfaceIdVO);
+        UserIdAndInterfaceIdDTO userIdAndInterfaceIdDTO = new UserIdAndInterfaceIdDTO(userIdAndSecretKeyDTO.getId(), interfaceIdAndStatusDTO.getInterfaceId());
+        Long leftNum = userInterfaceRecordDubboService.selectLeftNumByUserIdAndInterfaceId(userIdAndInterfaceIdDTO);
         if (Objects.isNull(leftNum) || leftNum <= 0) {
             log.info("请求未通过 原因:剩余调用次数不足");
             return intercept("请求未通过 原因:剩余调用次数不足");
         }
-        userInterfaceRecordMapper.updateLeftNumByUserIdAndInterfaceId(userIdAndInterfaceIdVO);
+        userInterfaceRecordDubboService.updateLeftNumByUserIdAndInterfaceId(userIdAndInterfaceIdDTO);
         log.info("请求通过");
         return chain.filter(exchange);
     }
