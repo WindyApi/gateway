@@ -71,6 +71,11 @@ public class InterfaceInvokeRecordDTO {
     private String accessKey;
 
     /**
+     * 调用用户id
+     */
+    private Long userId;
+
+    /**
      * 用户签名
      */
     private String sign;

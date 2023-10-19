@@ -83,7 +83,7 @@ public class CustomerGlobalFilter implements GlobalFilter {
         String timestamp = headers.getFirst(TIMESTAMP_HEADER);
         if (StrUtil.isBlank(timestamp)) {
             log.info("请求未通过 原因:未携带时间戳");
-            return intercept("请求未通过 原因:未携带时间戳");
+            return intercept("请求未通过 原因:未携带时间戳", null);
         }
 
         // 查询用户的id和secretKey
@@ -91,8 +91,9 @@ public class CustomerGlobalFilter implements GlobalFilter {
         UserIdAndSecretKeyDTO userIdAndSecretKeyDTO = userDubboService.selectUserIdAndSecretKeyByAccessKey(accessKey);
         if (Objects.isNull(userIdAndSecretKeyDTO)) {
             log.info("请求未通过 原因:accessKey错误");
-            return intercept("请求未通过 原因:accessKey错误");
+            return intercept("请求未通过 原因:accessKey错误", null);
         }
+        Long userId = userIdAndSecretKeyDTO.getUserId();
 
         // 签名校验
         String requestBody = (request.getMethod() == HttpMethod.GET) ? headers.getFirst(PARAMS_HEADER) : headers.getFirst(BODY_HEADER);
@@ -102,14 +103,14 @@ public class CustomerGlobalFilter implements GlobalFilter {
             // 签名校验失败
             response.setStatusCode(HttpStatus.FORBIDDEN);
             log.info("请求未通过 原因:签名校验失败");
-            return intercept("请求未通过 原因:签名校验失败");
+            return intercept("请求未通过 原因:签名校验失败", userId);
         }
 
         // 超时判断
         if (isTimestampExpired(Long.parseLong(timestamp))) {
             response.setStatusCode(HttpStatus.FORBIDDEN);
             log.info("请求未通过 原因:请求超时");
-            return intercept("请求未通过 原因:请求超时");
+            return intercept("请求未通过 原因:请求超时", userId);
         }
 
         // 判断接口状态
@@ -117,19 +118,19 @@ public class CustomerGlobalFilter implements GlobalFilter {
         if (!interfaceIdAndStatusDTO.getStatus()) {
             // 接口已下线，不允许调用
             log.info("请求未通过 原因:接口已下线");
-            return intercept("请求未通过 原因:接口已下线");
+            return intercept("请求未通过 原因:接口已下线", userId);
         }
 
         // 判断用户剩余可用次数
-        UserIdAndInterfaceIdDTO userIdAndInterfaceIdDTO = new UserIdAndInterfaceIdDTO(userIdAndSecretKeyDTO.getId(), interfaceIdAndStatusDTO.getInterfaceId());
+        UserIdAndInterfaceIdDTO userIdAndInterfaceIdDTO = new UserIdAndInterfaceIdDTO(userIdAndSecretKeyDTO.getUserId(), interfaceIdAndStatusDTO.getInterfaceId());
         Long leftNum = userInterfaceRecordDubboService.selectLeftNumByUserIdAndInterfaceId(userIdAndInterfaceIdDTO);
         if (Objects.isNull(leftNum) || leftNum <= 0) {
             log.info("请求未通过 原因:剩余调用次数不足");
-            return intercept("请求未通过 原因:剩余调用次数不足");
+            return intercept("请求未通过 原因:剩余调用次数不足", userId);
         }
         userInterfaceRecordDubboService.updateLeftNumByUserIdAndInterfaceId(userIdAndInterfaceIdDTO);
         log.info("请求通过");
-        setResult(Boolean.TRUE, "请求通过");
+        setResult(Boolean.TRUE, "请求通过", userId);
         return chain.filter(exchange);
     }
 
@@ -164,19 +165,20 @@ public class CustomerGlobalFilter implements GlobalFilter {
         log.info("请求签名:{}", request.getHeaders().getFirst("sign"));
     }
 
-    private Mono<Void> intercept(String msg) {
+    private Mono<Void> intercept(String msg, Long userId) {
         String responseResult = JSONUtil.toJsonStr(ResponseResult.error(msg));
         byte[] bytes = responseResult.getBytes(StandardCharsets.UTF_8);
         response.getHeaders().set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE + ";charset=" + StandardCharsets.UTF_8);
         DataBuffer buffer = response.bufferFactory().wrap(bytes);
         String errorMsg = (msg.split(":"))[1];
-        setResult(Boolean.FALSE, errorMsg);
+        setResult(Boolean.FALSE, errorMsg, userId);
         timeUtil.endTiming();
         return response.writeWith(Mono.just(buffer));
     }
 
-    private void setResult(Boolean accept, String msg) {
+    private void setResult(Boolean accept, String msg, Long userId) {
         interfaceInvokeRecordDTO.setAccept(accept);
         interfaceInvokeRecordDTO.setMsg(msg);
+        interfaceInvokeRecordDTO.setUserId(userId);
     }
 }
