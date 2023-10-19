@@ -4,6 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.annotation.Order;
@@ -21,6 +22,7 @@ import top.whiteleaf03.api.dubbo.interfaceinfo.InterfaceInfoDubboService;
 import top.whiteleaf03.api.dubbo.user.UserDubboService;
 import top.whiteleaf03.api.dubbo.userinterfacerecord.UserInterfaceRecordDubboService;
 import top.whiteleaf03.api.modal.dto.InterfaceIdAndStatusDTO;
+import top.whiteleaf03.api.modal.dto.InterfaceInvokeRecordDTO;
 import top.whiteleaf03.api.modal.dto.UserIdAndInterfaceIdDTO;
 import top.whiteleaf03.api.modal.dto.UserIdAndSecretKeyDTO;
 import top.whiteleaf03.api.util.ResponseResult;
@@ -52,20 +54,27 @@ public class CustomerGlobalFilter implements GlobalFilter {
     private static final long FIVE_MINUTES = Duration.ofMinutes(5).toMillis();
     private ServerHttpRequest request;
     private ServerHttpResponse response;
+    private InterfaceInvokeRecordDTO interfaceInvokeRecordDTO;
+    private final TimeUtil timeUtil;
+
+    @Autowired
+    public CustomerGlobalFilter(TimeUtil timeUtil) {
+        this.timeUtil = timeUtil;
+    }
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         request = exchange.getRequest();
         response = exchange.getResponse();
 
-        // 打印日志
-        printLog();
-
         // 通往用户中心，直接放行
         if (request.getPath().toString().startsWith("/platform/api/center")) {
             log.info("请求通过");
             return chain.filter(exchange);
         }
+
+        // 打印日志并保存记录
+        printLogAndSaveRecord();
 
         // 获取请求头
         HttpHeaders headers = request.getHeaders();
@@ -120,6 +129,7 @@ public class CustomerGlobalFilter implements GlobalFilter {
         }
         userInterfaceRecordDubboService.updateLeftNumByUserIdAndInterfaceId(userIdAndInterfaceIdDTO);
         log.info("请求通过");
+        setResult(Boolean.TRUE, "请求通过");
         return chain.filter(exchange);
     }
 
@@ -127,14 +137,20 @@ public class CustomerGlobalFilter implements GlobalFilter {
         return (System.currentTimeMillis() - timestamp > FIVE_MINUTES);
     }
 
-    private void printLog() {
+    private void printLogAndSaveRecord() {
         log.info("请求id:{}", request.getId());
         log.info("请求来源:{}", request.getRemoteAddress());
         log.info("请求方式:{}", request.getMethod());
         log.info("请求路径:{}", request.getPath());
         log.info("请求时间戳:{}", request.getHeaders().getFirst("timestamp"));
-        log.info("接收时间戳:{}", System.currentTimeMillis());
-        TimeUtil.startTiming();
+        Long currentTimestamp = System.currentTimeMillis();
+        log.info("接收时间戳:{}", currentTimestamp);
+
+        // 保存记录
+        interfaceInvokeRecordDTO = new InterfaceInvokeRecordDTO(request.getId(), request.getRemoteAddress(), request.getMethodValue(), request.getPath(), request.getHeaders().getFirst("timestamp"), currentTimestamp, request.getHeaders(), request.getQueryParams(), request.getBody(), request.getHeaders().getFirst("accessKey"), request.getHeaders().getFirst("sign"));
+        interfaceInvokeRecordDTO.setUseTime(System.currentTimeMillis());
+        timeUtil.saveRecord(interfaceInvokeRecordDTO);
+
         if (request.getMethod() == HttpMethod.GET) {
             // GET请求
             log.info("请求头参数:{}", request.getHeaders().getFirst("params"));
@@ -153,7 +169,14 @@ public class CustomerGlobalFilter implements GlobalFilter {
         byte[] bytes = responseResult.getBytes(StandardCharsets.UTF_8);
         response.getHeaders().set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE + ";charset=" + StandardCharsets.UTF_8);
         DataBuffer buffer = response.bufferFactory().wrap(bytes);
-        TimeUtil.endTiming();
+        String errorMsg = (msg.split(":"))[1];
+        setResult(Boolean.FALSE, errorMsg);
+        timeUtil.endTiming();
         return response.writeWith(Mono.just(buffer));
+    }
+
+    private void setResult(Boolean accept, String msg) {
+        interfaceInvokeRecordDTO.setAccept(accept);
+        interfaceInvokeRecordDTO.setMsg(msg);
     }
 }
