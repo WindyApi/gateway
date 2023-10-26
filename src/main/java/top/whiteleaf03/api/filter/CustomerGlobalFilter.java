@@ -73,6 +73,12 @@ public class CustomerGlobalFilter implements GlobalFilter {
             return chain.filter(exchange);
         }
 
+        // 接口中心Actuator，直接放行
+        if (request.getPath().toString().startsWith("/platform/api/interface/actuator")) {
+            log.info("请求通过");
+            return chain.filter(exchange);
+        }
+
         // 打印日志并保存记录
         printLogAndSaveRecord();
 
