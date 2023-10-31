@@ -4,13 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 /**
  * @author WhiteLeaf03
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserIdAndInterfaceIdDTO {
+public class UserIdAndInterfaceIdDTO implements Serializable {
     /**
      * 用户id
      */

@@ -11,6 +11,7 @@ import org.springframework.http.server.RequestPath;
 import org.springframework.util.MultiValueMap;
 import reactor.core.publisher.Flux;
 
+import java.io.Serializable;
 import java.net.InetSocketAddress;
 
 /**
@@ -19,7 +20,7 @@ import java.net.InetSocketAddress;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class InterfaceInvokeRecordDTO {
+public class InterfaceInvokeRecordDTO implements Serializable {
     /**
      * 请求id
      */
